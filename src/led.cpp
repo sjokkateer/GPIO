@@ -30,17 +30,17 @@ Led::Led(char port, uint8_t pinNumber)
     this->off();
 }
 
-void Led::toggle()
-{
-    *this->port ^= (1 << this->pinNumber);
-}
-
 void Led::on()
-{
+{ 
     *this->port |= (1 << this->pinNumber);
 }
 
 void Led::off()
 {
     *this->port &= ~(1 << this->pinNumber);
+}
+
+void Led::toggle()
+{
+    *this->port ^= (1 << this->pinNumber);
 }
