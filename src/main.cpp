@@ -2,6 +2,8 @@
 #include "led.h"
 #include "button.h"
 
+const char* buttonStateMapping[] = { "NO_PRESS", "SHORT_PRESS", "LONG_PRESS" };
+
 volatile unsigned long time;
 
 Led led('D', 7);
@@ -14,6 +16,8 @@ void setup() {
 
   // Set up the interrupt registers.
   sei();
+
+  // Button one setup. //
   // activate interrupts for pins 0 to 7
   PCICR |= (1 << 0);
   // activate pcint0 aka PB0
@@ -36,11 +40,15 @@ ISR(PCINT0_vect)
 }
 
 void loop() {
-  Serial.print("PRESS: ");
-  Serial.print(button.pressTime);
-  Serial.print("ms RELEASE: ");
-  Serial.print(button.releaseTime);
-  Serial.print("ms");
-  Serial.print(" STATE: ");
-  Serial.println(button.getState());
+  if (button.getState() != NO_PRESS)
+  {
+    Serial.print("BUTTON PRESS: ");
+    Serial.println(buttonStateMapping[button.getState()]);
+
+    button.getLed()->updateState(button.getState());
+
+    button.reset();
+  }
+
+  button.getLed()->act();
 }
