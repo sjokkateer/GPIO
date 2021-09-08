@@ -83,3 +83,8 @@ void Button::controls(Led *led)
 {
     this->led = led;
 }
+
+Led* Button::getLed()
+{
+    return this->led;
+}

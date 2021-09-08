@@ -9,21 +9,20 @@ class Button
         volatile uint8_t *ddr;
         volatile uint8_t *pin;
         ButtonState state;
-        
         uint8_t pinNumber;
         Led *led;
-
-        void setRegistersFor(char);
-    public:
-        volatile unsigned long pressTime;
+        unsigned long pressTime;
         unsigned long releaseTime;
         
+        void setRegistersFor(char);
+    public:        
         Button(char, uint8_t);
-        void determineState();
+        void controls(Led*);
         void setPressTime(unsigned long);
         void setReleaseTime(unsigned long);
+        void determineState();
         ButtonState getState();
         void reset();
         bool isPressed();
-        void controls(Led*);
+        Led* getLed();
 };
