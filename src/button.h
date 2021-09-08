@@ -15,7 +15,7 @@ class Button
         unsigned long releaseTime;
         
         void setRegistersFor(char);
-    public:        
+    public:
         Button(char, uint8_t);
         void controls(Led*);
         void setPressTime(unsigned long);
