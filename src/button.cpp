@@ -1,5 +1,6 @@
 #include "button.h"
 #include "button-state.h"
+#include "voltage.h"
 
 Button::Button(char port, uint8_t pinNumber)
 {
@@ -12,6 +13,11 @@ Button::Button(char port, uint8_t pinNumber)
     this->releaseTime = 0;
 
     this->determineState();
+}
+
+int Button::getPinValue()
+{
+    return (*this->pin & (1 << this->pinNumber)) >> this->pinNumber;
 }
 
 void Button::setRegistersFor(char port)
@@ -76,7 +82,7 @@ ButtonState Button::getState()
 
 bool Button::isPressed()
 {
-    return (*this->pin & (1 << this->pinNumber)) == 0;
+    return (*this->pin & (1 << this->pinNumber)) == LOW;
 }
 
 void Button::controls(Led *led)

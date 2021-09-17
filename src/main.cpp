@@ -9,9 +9,9 @@ volatile unsigned long time;
 
 volatile bool interrupted = false;
 
-// D7 and D13
 Led leds[] = {Led('C', 5), Led('C', 4)};
-Button buttons[] = {Button('B', 0), Button('D', 2)};
+Button buttons[] = {Button('B', 0), Button('B', 1)};
+int previousPinValue[] = {1, 1};
 
 void actOnButton(Button *);
 
@@ -19,53 +19,50 @@ void setup()
 {
   Serial.begin(9600);
 
+  // Assign leds to the buttons controlling them.
   buttons[0].controls(&leds[0]);
   buttons[1].controls(&leds[1]);
 
-  // Set up the interrupt registers.
+  // Enable interrupts
   sei();
 
-  // activate interrupts for pins 0 to 7
+  // activate interrupts for pins 0 to 7 (PCINT0..7)
   PCICR |= (1 << 0);
-  // // activate pcint0 aka PB0 (D8)
-  PCMSK0 |= (1 << 0);
-
-  // Another one.
-  // activate interrupts for pins 16 to 23 (PCIE2)
-  PCICR |= (1 << 2);
-  // activate pcint18 aka PD2 (D2)
-  PCMSK2 |= (1 << 2);
+  // // activate pcint1 PB1 (D9) and pcint0 PB0 (D8)
+  PCMSK0 |= (1 << 1) | (1 << 0);
 }
+
+volatile bool test = false;
 
 ISR(PCINT0_vect)
 {
-  actOnButton(&buttons[0]);
-}
+  test = true;
 
-ISR(PCINT2_vect)
-{
-  actOnButton(&buttons[1]);
-}
-
-void actOnButton(Button *button)
-{
-  time = millis();
-
-  if (button->isPressed())
+  for (int i = 0; i < NUMBER_OF_BUTTONS; i++)
   {
-    button->setPressTime(time);
-  }
-  else
-  {
-    button->setReleaseTime(time);
-    button->determineState();
+    if (buttons[i].getPinValue() != previousPinValue[i])
+    {
+      if (buttons[i].isPressed())
+      {
+        buttons[i].setPressTime(millis());
+   
+        previousPinValue[i] = 0;
+      }
+      else
+      {
+        buttons[i].setReleaseTime(millis());
+        buttons[i].determineState();
+
+        previousPinValue[i] = 1;
+      }
+    }
   }
 }
 
 void loop()
 {
   for (int i = 0; i < NUMBER_OF_BUTTONS; i++)
-  {
+  { 
     if (buttons[i].getState() != NO_PRESS)
     {
       Serial.print("BUTTON PRESS: ");
