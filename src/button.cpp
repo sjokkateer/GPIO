@@ -1,6 +1,5 @@
 #include "button.h"
 #include "button-state.h"
-#include "voltage.h"
 
 Button::Button(char port, uint8_t pinNumber)
 {
@@ -9,13 +8,16 @@ Button::Button(char port, uint8_t pinNumber)
 
     *this->ddr &= ~(1 << this->pinNumber);
 
+    this->initialPinValue = this->getPinBitValue();
+    this->previousPinvalue = this->initialPinValue;
+
     this->pressTime = 0;
     this->releaseTime = 0;
 
     this->determineState();
 }
 
-int Button::getPinValue()
+uint8_t Button::getPinBitValue()
 {
     return (*this->pin & (1 << this->pinNumber)) >> this->pinNumber;
 }
@@ -80,9 +82,22 @@ ButtonState Button::getState()
     return this->state;
 }
 
+bool Button::isUnchanged()
+{
+    return this->getPinBitValue() == this->previousPinvalue;
+}
+
 bool Button::isPressed()
 {
-    return (*this->pin & (1 << this->pinNumber)) == LOW;
+    // So if pullup, initial was 1 thus 1 -> 0 is pressed
+    // alternatively pulldown, initial was 0 thus 0 -> 1 is pressed
+    // if same bit value as initial it's in neutral/not pressed state.
+    return this->getPinBitValue() != this->initialPinValue;
+}
+
+void Button::setPreviousPinValue()
+{
+    this->previousPinvalue = this->getPinBitValue();
 }
 
 void Button::controls(Led *led)
