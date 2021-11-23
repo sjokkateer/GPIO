@@ -17,6 +17,7 @@ private:
     void on();
     void off();
     void blink();
+    void blinkTwice();
 public:
     Led(char, uint8_t);
     void updateState(ButtonState);

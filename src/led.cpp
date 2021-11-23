@@ -58,8 +58,7 @@ void Led::act()
             this->on();
             break;
         case BLINK:
-            this->blink();
-            this->blink();
+            this->blinkTwice();
             break;
     }
 }
@@ -80,4 +79,10 @@ void Led::blink()
     _delay_ms(250);
     this->off();
     _delay_ms(250);
+}
+
+void Led::blinkTwice()
+{
+    this->blink();
+    this->blink();
 }
